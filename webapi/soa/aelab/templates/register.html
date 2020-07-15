@@ -1,0 +1,65 @@
+{% import "macros.html" as macros %}
+{% extends "basic_bootstrap.html" %}
+
+{% block navlink %}
+    <li class="nav-item">
+      <a class="nav-link" href="homepage">Home</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="login">Log in</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="register">Sign up</a>
+    </li>
+{% endblock %}
+
+{% block explanation %}
+ <p>Drones allow opening previously unavailable opportunities – to see the
+    invisible and reach the unreachable – not only in the air but also on
+    the ground and underwater. Drawing on our 30-year experience in
+    software development, we discover drone software architecture, discuss
+    a basic and extended set of features for modern drone apps, and give
+    an overview of trends that are likely to shape the future of drone
+    software development. </p>
+{% endblock %}
+
+{% block left_title %}
+  {{ macros.block_title( "Register Here" ) }}
+{% endblock %}
+
+{% block left_box %}
+  <div class="border border-success rounded p-3"  style="width:400px;margin:auto">
+    <div class="" id="sign_up">
+      <form class="" action="" method="POST">
+        <fieldset class="border p-2">
+          {{ form.hidden_tag() }}
+          <legend class="w-auto">Sign up</legend>
+          <div class="form-group">
+            {{ form.email.label(style="margin-left:15px;")}}
+            {{ form.email(style="width:200px;margin-left:15px;", class_="form-control ") }}
+          </div>
+          <div class="form-group">
+            {{ form.username.label(style="margin-left:15px;")}}
+            {{ form.username(style="width:200px;margin-left:15px;", class_="form-control ") }}
+          </div>
+          <div class="form-group">
+            {{ form.student_id.label(style="margin-left:15px;")}}
+            {{ form.student_id(style="width:200px;margin-left:15px;", class_="form-control ") }}
+          </div>
+          <div class="form-group">
+            {{ form.password.label(style="margin-left:15px;")}}
+            {{ form.password(style="width:200px;margin-left:15px;", class_="form-control ") }}
+          </div>
+          <div class="form-group">
+            {{ form.confirm.label(style="margin-left:15px;")}}
+            {{ form.confirm(style="width:200px;margin-left:15px;", class_="form-control ") }}
+          </div>
+          <div class="form-group">
+            {{ form.submit(style="width:120px;margin-left:15px;", class_="btn btn-primary") }}
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,79 @@
+{% import "macros.html" as macros %}
+{% extends "basic_bootstrap.html" %}
+
+{% block navlink %}
+    <li class="nav-item">
+      <a class="nav-link" href="login">Log in</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="register">Sign up</a>
+    </li>
+{% endblock %}
+
+{% block explanation %}
+ <p>Drones allow opening previously unavailable opportunities – to see the
+    invisible and reach the unreachable – not only in the air but also on
+    the ground and underwater. Drawing on our 30-year experience in
+    software development, we discover drone software architecture, discuss
+    a basic and extended set of features for modern drone apps, and give
+    an overview of trends that are likely to shape the future of drone
+    software development. </p>
+{% endblock %}
+
+{% block left_title %}
+  {{ macros.block_title( "Industries where drones are used" ) }}
+{% endblock %}
+
+{% block left_box %}
+  <p>Modern drones are not only about thrilling aerial footages. Drones are
+     gaining popularity across all kinds of markets. By the year 2022, the
+     commercial drone market is expected to reach $10,738 million. According
+     to Goldman Sachs, the fastest adopters of drone techs will be such
+     industries as:</p><br>
+     <ul>
+       <li> <strong>Construction:</strong>
+         Surveying buildings; creating contour maps; building roads and
+         railways; counting construction supplies.
+       </li>
+       <li> <strong>Agriculture:</strong>
+         Monitoring plants and livestock; monitoring water use; spraying crops.
+       </li>
+       <li> <strong>Insurance:</strong>
+         Damage inspection; risk assessment; fraud monitoring.
+       </li>
+       <li> <strong>Oil & gas:</strong>
+         Laying and monitoring oils & gas pipelines.
+       </li>
+       <li> <strong>Security:</strong>
+        Monitoring state boundaries; ensuring security during public events.
+       </li>
+     </ul>
+{% endblock %}
+
+{% block right_title %}
+  {{ macros.block_title( "An introduction to microservices" ) }}
+{% endblock %}
+
+{% block right_box%}
+  <p>Traditional monolithic applications are deployed as a single package,
+     usually as a web or enterprise-archive file (WAR or EAR). They contain
+     all the business logic required to complete multiple tasks, often alongside
+     the components required to render the user interface (UI, or GUI
+     for graphical user interface). When scaling, this usually means taking a
+     complete copy of that entire application archive onto a new server
+     node (basically, deploying it to another server node in a cluster).
+     It doesn’t matter where the load or bottleneck is occurring; even if it’s
+     only in a small cross section of the application, scaling this way is an
+     all-or-nothing approach. Microservices are specifically designed to target
+     and change this all-or-nothing aspect by allowing you to break your business
+      logic into smaller, more manageable elements that can be employed in
+      multiple ways.
+  </p>
+
+  <p>
+    Microservices offer you the advantage of being able to scale individual
+    services, and the ability to develop and maintain multiple services in
+    parallel using several teams, but they still require a robust approach when
+    it comes to testing.
+  </p>
+{% endblock %}

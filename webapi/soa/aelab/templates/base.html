@@ -1,0 +1,20 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }} - aelab@client_service </title>
+      {% else %}
+      <title>aelab@client_service </title>
+      {% endif %}
+    </head>
+    <body>
+        <div>
+            links:
+            <a href="/home">Home</a>
+            <a href="/user_reg">Sign up</a>
+            <a href="/login">Login</a>
+        </div>
+        <div class="">
+          {% block content %}{% endblock %}
+        </div>
+    </body>
+</html>

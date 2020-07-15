@@ -1,0 +1,113 @@
+{% import "macros.html" as macros %}
+{% extends "basic_bootstrap.html" %}
+
+{% block navlink %}
+  <li class="nav-item">
+    <a class="nav-link" href="services">Services</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="accreditation">Accreditation</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="missions">Missions</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">
+      <h5> <span class="badge badge-pill badge-success">{{username}}</span></h5>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="logout">Log out</a>
+  </li>
+{% endblock %}
+
+{% block explanation %}
+ <p>platform for indoor drone operations and regulation </p>
+{% endblock %}
+
+{% block left_title %}
+  {{ macros.block_title( "Here you can choose a mission" ) }}
+{% endblock %}
+
+{% block right_title %}
+  {{ macros.block_title( "Results of the misson" ) }}
+{% endblock %}
+
+{% block left_box %}
+  <div class="border border-success rounded p-3"  style="width:500px;margin:auto">
+    <select  id ="mission" class="mdb-select md-form" onchange="selected_mission();">
+    <option id ="default_mission" value="default" disabled selected>Choose your mission</option>
+    <option value="Arming">Arming</option>
+    <option value="Takeoff">Takeoff </option>
+    <option value="Goto">Goto</option>
+    </select>
+
+    <div  class="" id="arming" style="display:none;">
+      <form name="arming" class="" action="" method="POST">
+        <fieldset id="" class="border p-2">
+          {{ arming_form.hidden_tag() }}
+          <legend class="w-auto">Drone arming</legend>
+          <label for=""><b> Enter the credential*:</b> </label>
+          <div class="form-inline form-group">
+            {{ arming_form.credential(style="width:320px;margin-right:8px;", class_="form-control ")}}
+          </div>
+          <div class="form-group">
+            {{arming_form.arm(style="width:120px;margin-right:8px;", class_="btn btn-primary")}}
+          </div>
+        </fieldset>
+      </form>
+    </div>
+
+    <div  class="" id="takeoff" style="display:none;">
+      <form  name="takeoff" class="" action="" method="POST">
+        <fieldset id="" class="border p-2">
+          {{ takeoff_form.hidden_tag() }}
+          <legend class="w-auto">take off </legend>
+          <label for=""><b>Altitude*:</b> </label>
+          <div class="form-group">
+            {{takeoff_form.alt(style="width:120px;margin-right:8px;", class_="form-control ")}}
+          </div>
+          <label for=""><b> Enter the credential*:</b> </label>
+          <div class="form-inline form-group">
+            {{ takeoff_form.credential(style="width:320px;margin-right:8px;", class_="form-control ")}}
+          </div>
+          {{takeoff_form.takeoff(style="width:120px;margin-right:8px;", class_="btn btn-primary")}}
+        </fieldset>
+      </form>
+    </div>
+
+    <div  class="" id="goto" style="display:none;">
+      <form  name="goto" class="" action="" method="POST">
+        <fieldset id="" class="border p-2">
+          {{ goto_form.hidden_tag() }}
+          <legend class="w-auto">Go to </legend>
+          <div class="">
+            <label for="mission"><b>Lat* & Long* & Alt*:</b></label>
+            <div  class="form-inline form-group" >
+              {{ goto_form.lat(style="width:120px;margin-right:8px;", class_="form-control ")}}
+              {{ goto_form.long(style="width:120px;margin-right:8px;", class_="form-control ")}}
+              {{ goto_form.alt(style="width:120px;margin-right:8px;", class_="form-control ")}}
+            </div>
+            <label for=""><b> Enter the credential*:</b> </label>
+            <div class="form-inline form-group">
+              {{ goto_form.credential(style="width:320px;margin-right:8px;", class_="form-control ")}}
+            </div>
+          </div>
+          {{goto_form.goto(style="width:120px;margin-right:8px;", class_="btn btn-primary")}}
+        </fieldset>
+      </form>
+    </div>
+
+
+
+  </div>
+
+{% endblock %}
+
+
+{% block right_box  %}
+  {% if msg %}
+    <br><p class="text-center">{{msg['result']}}</p>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "basic_bootstrap.html" %}
+
+{% block missions %}
+
+  <div class="border border-success rounded p-3" style="width:500px; margin:auto"">
+    <select class="mdb-select md-form">
+    <option value="" disabled selected>Choose your option</option>
+    <option value="1">Option 1</option>
+    <option value="2">Option 2</option>
+    <option value="3">Option 3</option>
+    </select>
+  </div>
+
+  <form  class="" action="" method="post">
+    <fieldset id="mission_title" class="border p-2">
+      {{ form.hidden_tag() }}
+      <legend class="w-auto"> <span class="number">1</span>form title </legend>
+      <div class="form-group">
+        {{form.mission(style="width:170px;margin-right:8px;", class_="form-control ", onchange="selected_mission();")}}
+        <br>
+        <h6 > <b value="" id="text_value" style="font-size:1em;">Instruction for selected mission </b> </h6>
+      </div>
+
+      <div class="" id="takeoff" style="display:none;">
+        <div  class="form-group" >
+          {{ form.alt(style="width:120px;margin-right:8px;", class_="form-control ")}}
+        </div>
+      </div>
+
+      <div class="" id="goto" style="display:none;">
+        <label for="mission">Lat* & Long* & Alt*</label>
+        <div  class=" form-inline form-group" >
+          {{ form.lat(style="width:120px;margin-right:8px;", class_="form-control ")}}
+          {{ form.long(style="width:120px;margin-right:8px;", class_="form-control ")}}
+          {{ form.alt(style="width:120px;margin-right:8px;", class_="form-control ")}}
+        </div>
+        <label for=""><b> Enter the credential:</b> </label>
+        <div class="form-inline form-group">
+          {{ form.credential(style="width:320px;margin-right:8px;", class_="form-control ")}}
+        </div>
+      </div>
+
+      {{form.submit(style="width:120px;margin-right:8px;", class_="btn btn-primary")}}
+    </fieldset>
+  </form>
+
+
+{% endblock %}

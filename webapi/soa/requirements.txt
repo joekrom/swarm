@@ -1,0 +1,12 @@
+Flask
+flask_restful
+flask-restplus
+flask-bootstrap
+flask-login
+Flask-Mail
+Flask-WTF
+pymongo
+paho-mqtt
+bcrypt
+requests
+werkzeug

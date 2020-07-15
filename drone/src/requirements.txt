@@ -1,0 +1,7 @@
+dronekit==2.9.2
+Flask
+flask_restful
+flask-restplus
+pymongo
+requests
+MAVProxy
