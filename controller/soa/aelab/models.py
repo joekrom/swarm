@@ -109,15 +109,15 @@ class AccreditationModel:
 
     def send_credential(self,email,credential):
         msg = Message(
-          'Hello',
+          '@elabservice',
            sender='user@gmail.com',
-           recipients=
-           [str(email)])
-        msg.body = credential
+           recipients=[str(email)]
+        )
+        msg.body = "this is your clearance key :" + credential
         mail.send(msg)
 
     def flight_approval(self,input):
-        #input data we get from the form , now we retive data from the form
+        #input data we get from the form , now we retrieve data from the form
         radius = int(input['radius'])
         altitude = int(input['altitude'])
         username = str(input['username'])
@@ -139,16 +139,20 @@ class AccreditationModel:
         #we first check if the flight plan of the user
         if ( (altitude > 3) or  (radius > 5) ):
             answer = {"result":"The flight plan was not approved,retry",
-                      "message": "change altitude or radius",
+                      "message": "accrediation denied, flight parameter not accepted",
                       "status_code": 401
             }
             return answer
         else :
             # we check if date is in the past
-            now = datetime.now()
+            now = self.get_current_time()
             if start_time_obj < now:
 
-                answer={"result":405}
+                answer={
+                    "result":"invalid information",
+                    "message":"inaccurate data",
+                     "status_code": 405
+                }
                 return answer
 
             #we check if there is a free  time slot
@@ -180,6 +184,7 @@ class AccreditationModel:
                                 # there is no intersection
                                 free_time_slot = False
                                 answer={"result":"this slot is no more available",
+                                        "message": "time slot already reserved",
                                         "status_code":402
                                 }
                                 break
@@ -194,9 +199,11 @@ class AccreditationModel:
             credential = self.credential_key()
             #we send request to the db
             self.add_accreditation(username,drone_name,credential,date,start_time,end_time)
-            # we send the email
-            self.send_credential("joel.fankam@gmail.com",credential)
+            # retrive the email of the user and then config a SMTP EMAIL
+            # we send the email using the email corresponding to username
+            self.send_credential("joel.dfankam@yahoo.fr",credential)
             answer={"result":"this slot is free, check your email",
+                    "message":"accredition approved, check your mail to get the key ",
                     "status_code":200
             }
 

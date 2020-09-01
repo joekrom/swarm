@@ -1,0 +1,97 @@
+{% import "macros.html" as macros %}
+{% extends "basic_bootstrap.html" %}
+
+{% block navlink %}
+<li class="nav-item">
+  <a class="nav-link" href="services">Services</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="accreditation">Accreditation</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="missions">Missions</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="#">
+    <h5> <span class="badge badge-pill badge-success">{{username}}</span></h5>
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="logout">Log out </a>
+</li>
+{% endblock %}
+
+{% block explanation %}
+ <p>platform for indoor drone operations and regulation </p>
+{% endblock %}
+
+{% block left_title %}
+  {{ macros.block_title( "Please enter all the required information" ) }}
+{% endblock %}
+
+{% block left_box %}
+  <div class="border border-success rounded p-3"  style="width:500px;margin:auto">
+    <div class="" id="sign_up">
+      <form class="" action="" method="POST">
+        <fieldset class="border p-2">
+          {{ form.hidden_tag() }}
+          <legend class="w-auto">PreCheck-Flight</legend>
+          <div class="">
+            <label for="email">Date* Time* & Duration*</label>
+            <div class=" form-inline form-group ">
+              {{form.date(style="width:160px;margin-right:8px;", class_="form-control ")}}
+              {{form.hour(style="width:110px;margin-right:8px;", class_="form-control ")}}
+              {{form.duration(style="width:80px;margin-right:8px;", class_="form-control ")}}
+            </div>
+          </div>
+          <div class="">
+            <label for="email">Altitude* & Radius*</label>
+            <div class=" form-inline form-group ">
+              {{form.altitude(style="width:110px;margin-right:8px;", class_="form-control ")}}
+              {{form.radius(style="width:80px;margin-right:8px;", class_="form-control ")}}
+            </div>
+          </div>
+          <div class="form-group">
+            <p>Choose a drone:</p>
+            {{form.type(style="width:80px;margin-right:8px;", class_="form-control ")}}
+          </div>
+          {{form.submit(style="width:120px;margin-right:8px;", class_="btn btn-primary")}}
+        </fieldset>
+      </form>
+      {% if result %}
+        <p class="text-center font-weight-bold text-info">{{result['msg']}}</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block right_title %}
+  {{ macros.block_title( "List of drone" ) }}
+{% endblock %}
+
+
+
+{% block right_box  %}
+  <div id="carouselExampleControls" class=" row carousel slide " data-ride="carousel">
+    <div class="carousel-inner">
+      {% for drone in drones %}
+      <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+        <div class="card mx-auto" style="width:400px;height:400px">
+          <div class="card-body">
+            <h4 class="card-title">{{drone['name']}}</h4>
+            <p class="card-text">type: {{drone["type"]}} <br>  max_altitude: {{drone["max_alt"]}} m </p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+    </div>
+  </div>
+{% endblock %}

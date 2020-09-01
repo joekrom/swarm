@@ -1,141 +1,87 @@
+#!/usr/bin/env python
 from dronekit import connect ,VehicleMode,LocationGlobalRelative
 from flask import Flask, request, jsonify
+import requests, threading
+
+import werkzeug
+werkzeug.cached_property = werkzeug.utils.cached_property # To resolve a bug from flask-restplus
+from flask_restplus import Api,Resource, fields, Namespace
+
+from uav import Drone
 import time,socket,threading,json
+
+service_key  = 'reg_key'
 
 # global varaibale that will be use for handling the drone object
 
 drone=None
 # list of mode that are enabled
-modes_list=[
-    'STABILISE',
-    'GUIDED',
-    'LOITER',
-    'RTL'
-]
 
-class Drone:
-    def __init__(self,vehicle):
-        self.vehicle = vehicle
 
-    def set_vehicle_mode(self,mode):
-        self.vehicle.mode=VehicleMode(mode)
-        time.sleep(1)
-        return "vehicle mode changed with success"
+# event variable to communicate between threads
 
-    def get_vehicle(self):
-        return self.vehicle
-    def get_system_status(self):
-        return self.vehicle.system_status.state
 
-    def get_std_info(self):
-        pass
-
-    def get_state(self):
-        self.state['system_status']=str(self.get_system_status())
-        self.state['alt']=str(self.get_altitude())
-        self.state['long']=str(self.get_longitude())
-        self.state['lat']=str(self.get_latitude())
-        self.state['location']=str(self.get_location())
-        return self.state
-
-    def get_location(self):
-        return self.vehicle.location.global_relative_frame
-
-    def get_longitude(self):
-        return self.vehicle.location.global_relative_frame.lon
-
-    def get_latitude(self):
-        return self.vehicle.location.global_relative_frame.lat
-
-    def get_altitude(self):
-        return self.vehicle.location.global_relative_frame.alt
-
-    def get_vehicle_mode(self):
-        return self.vehicle.mode.name
-
-    #command to send to the vehicle
-    def arm_disarm_vehicle(self,value):
-        if not self.vehicle.armed and value :
-            if not self.vehicle.is_armable:
-                print("waiting for vehicle to be armable")
-                print("arming motors")
-                self.vehicle.armed=True
-            while not self.vehicle.armed:
-                print("wait for aming to take effect ")
-                time.sleep(1)
-            return "vehicle is armed"
-        elif value:
-            print("vehicle is already armed")
-            return "vehicle is already armed"
-        else:
-            print("disarming motors ")
-            self.vehicle.armed=False
-            while self.vehicle.armed:
-                print("waiting for disarming to trake effect ")
-                time.sleep(1)
-            return "vehicle is disarmed"
-
-    def go_to_alt(self,alt):
-        #arm the vehilce
-        print("basic pre-arm checks ")
-        #dont arm until the autopilot is ready
-        while not self.vehicle.is_armable:
-            print("waiting for vehicle to initialize")
+class Connection(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+    def run(self):
+        global drone
+        drone = Drone()
+        check = False
+        while not check:
             time.sleep(1)
-        print("arming motors")
-        #copter should arm in GUIDED mode
-        self.vehicle.mode=VehicleMode("GUIDED")
-        time.sleep(1)
-        self.vehicle.armed=True
-        time.sleep(1)
+            l = drone.vehicle.last_heartbeat
+            if l != None:
+                check = True
+        print("Now we are connected to the drone ")
+        time.sleep(2)
+        t1=threading.Timer(5.0,drone.init_gps_lock)
+        t1.start()
+        # send pozyx data
+        x,y,z = 0,0,0
+        q = [1,0,0,0]
+        while True:
+            drone.pozyx_to_fc(x,y,z,q)
+            time.sleep(0.2)
 
-        #confirm vehicle is armed before attempting to take off
-        while not self.vehicle.armed:
-            print("waiting for arming")
-            time.sleep(1)
-        print("take off")
-        self.vehicle.simple_takeoff(alt)# takeoff to a target altitude
-        # wait until the vehicle reaches a safe height before processing the goto
-        #otherwise the the command
-        #after vehicle_takeoff will execute immediately
-        while True :
-            print("altitude: ",self.get_altitude())
-            print("velocity: ",self.vehicle.velocity)
-            print("battery: ",self.vehicle.battery)
-            #break and return from function just below target altitude
-            if self.get_altitude()>=alt*0.95:
-                print("reached a target altitude")
-                break
-            time.sleep(1)
-        # Hover for 10 seconds
-        time.sleep(10)
-        print("now let us land ")
-        self.vehicle.mode=VehicleMode("RTL")
-        time.sleep(1)
-        self.vehicle.close()
+
 
 app = Flask(__name__)
+drone_connection = Connection()
+api = Api(app, version='1.0', title='@elab_servive  API',
+    description='API Documentation',doc='/droneapi/v1/documentation')
+#this instruction helps to get rid of the default namesapce in the UI swagger
+api.namespaces.clear()
+drone_api = Namespace('drones')
+api.add_namespace(drone_api,path='/droneapi/v1/operations')
+
 app.secret_key="dronekit"
 # Threads that will be used to handle some request
 t1=None
-
-@app.before_first_request
-def func():
-    global drone
-    try :
-        #drone=Drone( connect('tcp:139.174.110.148:5760', wait_ready=True ) )
-        drone=Drone( connect('udp:172.28.0.4:14553',wait_ready=True) )
-        print("before_first_request is running connection successfull")
-        time.sleep(5)
-    # Other error
-    except:
-        print ("Some other error!")
-    """def run_job():
-        print("before_first_request is running connection successfull" )
-        #time.sleep(0.0001)
-
-    thread=threading.Thread(target=run_job)
-    thread.start()"""
+#
+# @app.before_first_request
+# def func():
+#     global drone
+#     try :
+#         #drone=Drone( connect('tcp:192.168.0.14:5763', wait_ready=True ) )
+#         drone=Drone( connect('udp:172.28.0.4:14553',wait_ready=True) )
+#         print("before_first_request is running connection successfull")
+#         time.sleep(5)
+#         # #perform trilateration and get the pose and orientation
+#         # x,y,z = 0,0,0
+#         # q = [1,0,0,0]
+#         # # send pozyx use a thread becuse of the infint loop
+#         # th = threading.Thread(target=drone.pozyx_to_fc,args=(x,y,z,q))
+#         # th.start()
+#
+#     except:
+#         print ("Some other error!")
+#     """def run_job():
+#         print("before_first_request is running connection successfull" )
+#         #time.sleep(0.0001)
+#
+#     thread=threading.Thread(target=run_job)
+#     thread.start()"""
 
 @app.route('/index')
 def index():
@@ -146,11 +92,17 @@ def test():
     return "welcome to dronekit sitl 4444  service"
 
 
-@app.route('/status_v2')
+@app.route('/get_mode')
 def get_state():
     global drone
-    status=drone.vehicle.system_status.state
+    status=drone.get_vehicle_mode()
     return str(status)
+
+@app.route('/get_pose')
+def get_pose():
+    global drone
+    pose=drone.get_position()
+    return str(pose['north'])
 
 @app.route('/status')
 def get_status():
@@ -184,7 +136,8 @@ def set_vehicle_mode():
     global drone
     posted_data=request.get_json()
     mode=str(posted_data["mode"])
-    return drone.set_vehicle_mode(mode)
+    drone.set_vehicle_mode(mode)
+    return "the mode habe been changed "
 
 @app.route('/go_to_alt',methods=['post'])
 def goto():
@@ -204,5 +157,179 @@ def goto():
     time.sleep(0.0001)
     return jsonify(response)
 
+
+
+
+class Arming(Resource):
+    global drone
+    rf = api.model('arming',{
+        'service_key':fields.String,
+        'command':fields.String
+    })
+
+    @api.doc(responses={
+        200: 'Success',
+        401: 'vehicle mot in arm mode',
+        500: 'Bad request'
+    })
+
+    @api.expect(rf,validate=True)
+    def post(self):
+        """
+            Allow to arm the drone
+        """
+        armed = None
+        try:
+            # get the request from the Controller service
+            data = request.get_json()
+            # we check if the request is coming from the controller service
+            s_key = data['service_key']
+            command = data['command']
+            if (service_key == s_key and command == "arm"):
+                armed = drone.arm_vehicle()
+                if armed:
+                    status_code = 200
+                    msg ="vehicle armed "
+                else :
+                    status_code = 401
+                    msg ="vehicle not in arm mode "
+            resp = {
+                "status_code":status_code,
+                "msg": msg
+            }
+            return jsonify(resp)
+
+        except:
+            status_code = 500
+            resp = {
+                "status_code":status_code,
+                "msg": "Internal server error"
+            }
+            return jsonify(resp)
+
+class Takeoff(Resource):
+    global drone
+    rf = api.model('takeoff',{
+        'service_key':fields.String,
+        'command':fields.String,
+        'altitude':fields.Integer
+    })
+
+
+    @api.doc(responses={
+        200: 'Success',
+        500: 'Bad request'
+    })
+
+    @api.expect(rf,validate=True)
+    def post(self):
+        """
+            Allow to fly the drone to a desired altitude and then land
+        """
+        try:
+            takeoff_data = request.get_json()
+            s_key = takeoff_data['service_key']
+            command = takeoff_data['command']
+            if (service_key == s_key and command == "takeoff"):
+                alt = takeoff_data['altitude']
+                # call the takeoff function
+                drone.pull_out(alt)
+                status_code = 200
+                resp = {
+                    "status_code":status_code
+                }
+                return jsonify(resp)
+        except:
+            status_code = 500
+            resp = {
+                "status_code":status_code
+            }
+        return jsonify(resp)
+
+class Goto(Resource):
+    global drone
+    rf = api.model('goto',{
+        'service_key':fields.String,
+        'command':fields.String,
+        'x':fields.Integer(description="x(m) in NED "),
+        'y':fields.Integer(description="y(m) in NED "),
+        'z':fields.Integer(description="z(m) in NED ")
+    })
+
+    @api.doc(responses={
+        200: 'Success',
+        500: 'Bad request'
+    })
+
+    @api.expect(rf,validate=True)
+    def post(self):
+        """
+            go to  a desired position
+        """
+        try:
+            status_code = 200
+            tatus_code = 208
+            resp = {
+                "status_code":status_code
+            }
+            return jsonify(resp)
+        except:
+            status_code = 500
+            resp = {
+                "status_code":status_code
+            }
+            return jsonify(resp)
+
+
+
+class Data(Resource):
+    global drone
+    @api.errorhandler
+    def get(self):
+        """
+            Allow to expose local psosition and battery status
+        """
+        #pose = drone.get_pose()
+        pose = drone.get_pose()
+        bsi = drone.get_bsi()
+        data = {
+            "x":pose['north'],
+            "y":pose['east'],
+            "z":pose['down'],
+            "bsi":bsi
+        }
+        return jsonify(data)
+
+
+
+
+
+drone_api.add_resource(Arming,'/arming')
+drone_api.add_resource(Takeoff,'/takeoff')
+drone_api.add_resource(Data,'/state')
+drone_api.add_resource(Goto,'/goto')
+
+# def start_runner():
+#     def start_loop():
+#         not_started = True
+#         while not_started:
+#             print("in start")
+#             try:
+#                 r = requests.get("http://dronekit:5000/index")
+#                 if r.status_code == 200:
+#                     not_started = False
+#             except:
+#                 print("service drone has not stated yet")
+#         print("started runner")
+#     th_start = threading.Thread(target=start_loop)
+#     th_start.start()
+#     # we ait until this thread terminates to call other thread
+#     th_start.join()
+
+
+
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',debug=True)
+    drone_connection.start()
+    app.run(host='0.0.0.0',debug=True, threaded=True,use_reloader=False)

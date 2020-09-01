@@ -1,0 +1,47 @@
+.page-header{
+  margin-top:0;
+}
+
+.panel-body{
+  padding-top:0;
+}
+
+.footer{
+   position: fixed;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   background: #333;
+   color: white;
+   text-align: center;
+   height: 80px;
+   padding: 35px;
+}
+
+body {
+   padding-top: 60px;
+ }
+
+html,body{
+     margin: 0;
+     height: 100%;
+ }
+
+/*.child{
+  position:absolute;
+  bottom: 0;
+  left:0;
+  right:0;
+}*/
+
+/*body{
+  //box-sizing: border-box;
+  border: solid red 5px;
+  border-radius: 2em;
+  //height: 100%;
+  //margin: 0;
+
+}
+.inner_remaining {
+  border: solid blue 5px;
+}*/

@@ -320,9 +320,10 @@ class Goto(Resource):
             result = {"result":"json error"}
 
         return jsonify(result)
+
 #define the route for the resources
 api.add_resource(Home,'/webapi/v1/homepage')
-users_api.add_resource(Sign_in,'/registered')
+users_api.add_resource(Sign_in,'/register')
 users_api.add_resource(Login,'/login')
 users_api.add_resource(Accreditation,'/accreditation')
 mission_api.add_resource(Arming,'/arming')

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Drone Registration </h1>
+  <p>you are logged in as {{current_user.username}}</p>
+  <form class="" action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.serial_number.label }}<br>
+      {{ form.serial_number(size=32) }}
+    </p>
+    <p>
+      {{ form.name.label }}<br>
+      {{ form.name(size=32) }}
+    </p>
+    <p>
+      {{ form.type.label }}<br>
+      {{ form.type(size=32) }}
+    </p>
+    <p>
+      {{ form.flight_time.label }}<br>
+      {{ form.flight_time(size=32) }}
+    </p>
+    <p>
+      {{ form.weight.label }}<br>
+      {{ form.weight(size=32) }}
+    </p>
+    <p>
+      {{ form.span.label }}<br>
+      {{ form.span(size=32) }}
+    </p>
+    <p>
+      {{ form.radius.label }}<br>
+      {{ form.radius(size=32) }}
+    </p>
+    <p>
+      {{ form.max_altitude.label }}<br>
+      {{ form.max_altitude(size=32) }}
+    </p>
+    <p>{{ form.submit }}</p>
+  </form>
+{% endblock %}

@@ -1,10 +1,11 @@
 from flask import Flask
 from flask_restplus import Api
 from flask import Blueprint
-
+from redis import Redis
 
 
 app = Flask(__name__)
+redis = Redis(host='redis', port=6379)
 
 app.config['SECRET_KEY'] = "rango"
 from flask_mail import Mail ,Message
@@ -23,7 +24,7 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 api = Api(app, version='1.0', title='@elab_servive  API',
-    description='API Documentation',doc='/serverapi/v1/documentation')
+    description='API Documentation',doc='/middleapi/v1/documentation')
 
 #api.namespaces.clear()
 
